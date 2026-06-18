@@ -60,11 +60,12 @@
   .card.swap{animation:pop .45s cubic-bezier(.2,.9,.25,1)}
   @keyframes pop{0%{opacity:0;transform:translateY(14px) scale(.97)}100%{opacity:1;transform:none}}
 
-  .next{display:flex;align-items:center;justify-content:space-between;gap:12px;
-    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:14px 18px}
-  .next .lbl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:800}
-  .next .val{font-family:'Anton',sans-serif;font-size:26px;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:.04em}
-  .progress{height:6px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+  .next{display:flex;flex-direction:column;align-items:center;gap:2px;
+    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:14px 18px 16px}
+  .next .lbl{font-size:11px;letter-spacing:.20em;text-transform:uppercase;color:var(--muted);font-weight:800}
+  .next .val{font-family:'Anton',sans-serif;font-size:clamp(54px,19vw,82px);line-height:1;color:var(--gold);
+    font-variant-numeric:tabular-nums;letter-spacing:.03em;text-shadow:0 6px 28px rgba(245,178,26,.28)}
+  .progress{height:7px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
   .progress > i{display:block;height:100%;width:0;border-radius:999px;
     background:linear-gradient(90deg,var(--red),var(--gold));transition:width .9s linear}
 
@@ -98,12 +99,12 @@
     <div class="task-desc" id="desc"></div>
   </div>
 
-  <div class="progress" id="progWrap"><i id="prog"></i></div>
-
   <div class="next" id="nextRow">
     <span class="lbl" id="nextLbl">Start in</span>
     <span class="val" id="nextVal">--:--</span>
   </div>
+
+  <div class="progress" id="progWrap"><i id="prog"></i></div>
 
   <div class="penalty"><span class="beer">🍺</span><span>Versagt oder Fehler gemacht? → Ein Kölsch exen!</span></div>
 
