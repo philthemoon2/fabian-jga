@@ -76,6 +76,11 @@
   .penalty .beer{font-size:22px;animation:tilt 2.4s ease-in-out infinite}
   @keyframes tilt{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
 
+  .flash{position:fixed;inset:0;z-index:60;pointer-events:none;opacity:0;
+    background:radial-gradient(circle at 50% 38%, rgba(245,178,26,.6), rgba(226,0,26,.28) 58%, transparent 78%)}
+  .flash.go{animation:flashpulse 1.7s ease-out}
+  @keyframes flashpulse{0%{opacity:0}7%{opacity:1}20%{opacity:0}33%{opacity:.92}47%{opacity:0}
+    60%{opacity:.8}74%{opacity:0}100%{opacity:0}}
   .soundbtn{background:none;border:1px dashed rgba(245,178,26,.32);color:var(--gold-soft);
     font-family:inherit;font-weight:800;font-size:13px;letter-spacing:.04em;padding:13px;border-radius:13px;cursor:pointer;width:100%}
   .soundbtn.on{border-style:solid;border-color:rgba(245,178,26,.6);background:rgba(245,178,26,.12);color:#fff}
@@ -88,6 +93,7 @@
 </head>
 <body>
 <div class="demo-badge" id="demoBadge">Demo-Vorschau · nicht echte Zeit</div>
+<div class="flash" id="flash"></div>
 <div class="wrap">
   <header>
     <div class="kicker">Junggesellenabschied</div>
@@ -193,6 +199,10 @@
     const t = audioCtx.currentTime; beep(880,t,0.10,0.22); beep(1175,t+0.12,0.12,0.22);
     if(navigator.vibrate) navigator.vibrate(80);
   }
+  function flashScreen(){
+    const f = $("flash");
+    f.classList.remove("go"); void f.offsetWidth; f.classList.add("go");
+  }
   function updateSoundBtn(){
     const b = $("soundBtn");
     b.textContent = alarmOn ? "🔔 Stunden-Alarm AN (zum Aus tippen)" : "🔕 Stunden-Alarm aktivieren";
@@ -274,7 +284,10 @@
         $("progWrap").style.display = "block";
       }
       card.classList.remove("swap"); void card.offsetWidth; card.classList.add("swap");
-      if(!firstRender && alarmOn && loc.phase === "active") playAlarm();
+      if(!firstRender && loc.phase === "active"){
+        flashScreen();
+        if(alarmOn) playAlarm();
+      }
     }
 
     if(loc.phase === "before"){
