@@ -76,6 +76,10 @@
   .penalty .beer{font-size:22px;animation:tilt 2.4s ease-in-out infinite}
   @keyframes tilt{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
 
+  .soundbtn{background:none;border:1px dashed rgba(245,178,26,.32);color:var(--gold-soft);
+    font-family:inherit;font-weight:800;font-size:13px;letter-spacing:.04em;padding:13px;border-radius:13px;cursor:pointer;width:100%}
+  .soundbtn.on{border-style:solid;border-color:rgba(245,178,26,.6);background:rgba(245,178,26,.12);color:#fff}
+  .soundbtn:active{transform:scale(.985)}
   .demo-badge{display:none;position:fixed;top:0;left:0;right:0;text-align:center;z-index:50;
     background:var(--red);color:#fff;font-weight:800;font-size:11px;letter-spacing:.22em;
     padding:5px;text-transform:uppercase}
@@ -107,6 +111,8 @@
   <div class="progress" id="progWrap"><i id="prog"></i></div>
 
   <div class="penalty"><span class="beer">🍺</span><span>Versagt oder Fehler gemacht? → Ein Kölsch exen!</span></div>
+
+  <button class="soundbtn" id="soundBtn" type="button">🔕 Stunden-Alarm aktivieren</button>
 
   <footer>Es zählt die Uhrzeit deines Handys · Prost 🍻</footer>
 </div>
@@ -159,6 +165,49 @@
   const realStart = Date.now();
   const nowMs = () => demoAnchor != null ? demoAnchor + (Date.now() - realStart) : Date.now();
 
+  // --- Stunden-Alarm (Ton wird im Browser erzeugt, keine Datei) ---
+  let audioCtx = null;
+  let alarmOn = localStorage.getItem("jga_alarm") === "1";
+  function ensureAudio(){
+    if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+    if(audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+  }
+  function beep(freq, at, dur, vol){
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = "square"; o.frequency.value = freq;
+    g.gain.setValueAtTime(0, at);
+    g.gain.linearRampToValueAtTime(vol, at+0.01);
+    g.gain.setValueAtTime(vol, at+dur-0.04);
+    g.gain.linearRampToValueAtTime(0, at+dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(at); o.stop(at+dur);
+  }
+  function playAlarm(){
+    ensureAudio(); if(!audioCtx) return;
+    let t = audioCtx.currentTime;
+    for(let r=0;r<3;r++){ [784,988,1175].forEach((f,i)=>beep(f, t+i*0.16, 0.14, 0.28)); t += 0.62; }
+    if(navigator.vibrate) navigator.vibrate([250,120,250,120,500]);
+  }
+  function playBlip(){
+    ensureAudio(); if(!audioCtx) return;
+    const t = audioCtx.currentTime; beep(880,t,0.10,0.22); beep(1175,t+0.12,0.12,0.22);
+    if(navigator.vibrate) navigator.vibrate(80);
+  }
+  function updateSoundBtn(){
+    const b = $("soundBtn");
+    b.textContent = alarmOn ? "🔔 Stunden-Alarm AN (zum Aus tippen)" : "🔕 Stunden-Alarm aktivieren";
+    b.classList.toggle("on", alarmOn);
+  }
+  $("soundBtn").addEventListener("click", ()=>{
+    alarmOn = !alarmOn;
+    localStorage.setItem("jga_alarm", alarmOn ? "1" : "0");
+    if(alarmOn) playBlip();           // kurzer Test-Ton = Bestätigung + schaltet Audio frei
+    updateSoundBtn();
+  });
+  updateSoundBtn();
+  // Audio nach Hintergrund/Sperre wieder aufwecken
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden && alarmOn) ensureAudio(); });
+
   function locate(now){
     if(now < SLOTS[0].start) return {phase:"before"};
     const last = SLOTS[SLOTS.length-1];
@@ -182,6 +231,7 @@
     const sig = loc.phase + ":" + (loc.idx!=null?loc.idx:(loc.next||""));
 
     if(sig !== lastSig){
+      const firstRender = (lastSig === "");
       lastSig = sig;
       const card = $("card");
       if(loc.phase === "before"){
@@ -224,6 +274,7 @@
         $("progWrap").style.display = "block";
       }
       card.classList.remove("swap"); void card.offsetWidth; card.classList.add("swap");
+      if(!firstRender && alarmOn && loc.phase === "active") playAlarm();
     }
 
     if(loc.phase === "before"){
