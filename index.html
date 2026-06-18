@@ -75,10 +75,14 @@
   .penalty .beer{font-size:22px;animation:tilt 2.4s ease-in-out infinite}
   @keyframes tilt{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
 
+  .demo-badge{display:none;position:fixed;top:0;left:0;right:0;text-align:center;z-index:50;
+    background:var(--red);color:#fff;font-weight:800;font-size:11px;letter-spacing:.22em;
+    padding:5px;text-transform:uppercase}
   footer{text-align:center;color:var(--muted);font-size:11px;letter-spacing:.08em;padding-top:2px}
 </style>
 </head>
 <body>
+<div class="demo-badge" id="demoBadge">Demo-Vorschau · nicht echte Zeit</div>
 <div class="wrap">
   <header>
     <div class="kicker">Junggesellenabschied</div>
@@ -146,6 +150,20 @@
   };
   const $ = id => document.getElementById(id);
 
+  // --- Demo-Modus: ?demo=1..18 (Aufgabe), ?demo=before, ?demo=pause, ?demo=after ---
+  let demoAnchor = null;
+  (function(){
+    const dm = new URLSearchParams(location.search).get("demo");
+    if(!dm) return;
+    if(dm === "before")      demoAnchor = SLOTS[0].start - 5*HOUR;
+    else if(dm === "pause")  demoAnchor = SLOTS[14].start + HOUR + 3*HOUR;
+    else if(dm === "after")  demoAnchor = SLOTS[SLOTS.length-1].start + HOUR + 60000;
+    else { const n = parseInt(dm,10); if(n>=1 && n<=SLOTS.length) demoAnchor = SLOTS[n-1].start + 25*60000; }
+    if(demoAnchor != null) $("demoBadge").style.display = "block";
+  })();
+  const realStart = Date.now();
+  const nowMs = () => demoAnchor != null ? demoAnchor + (Date.now() - realStart) : Date.now();
+
   function locate(now){
     if(now < SLOTS[0].start) return {phase:"before"};
     const last = SLOTS[SLOTS.length-1];
@@ -160,7 +178,7 @@
   let lastSig = "";
 
   function tick(){
-    const now = Date.now();
+    const now = nowMs();
     const d = new Date(now);
     $("clk").textContent = pad(d.getHours())+":"+pad(d.getMinutes());
     $("sec").textContent = pad(d.getSeconds());
