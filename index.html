@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d0b09">
+<title>Fabians JGA · Stunden-Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0b09;
+    --bg2:#16120d;
+    --card:#1d1813;
+    --gold:#f5b21a;
+    --gold-soft:#ffd877;
+    --red:#e2001a;
+    --cream:#f3e7cf;
+    --muted:#9a8c74;
+    --line:rgba(245,178,26,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -10%, #2a2013 0%, transparent 55%),
+      radial-gradient(100% 60% at 50% 110%, #1a0a0c 0%, transparent 55%),
+      var(--bg);
+    color:var(--cream);
+    min-height:100dvh;
+    display:flex;flex-direction:column;align-items:center;
+    padding:max(18px,env(safe-area-inset-top)) 18px max(22px,env(safe-area-inset-bottom));
+    overflow-x:hidden;
+  }
+  .wrap{width:100%;max-width:520px;display:flex;flex-direction:column;flex:1;gap:16px}
+
+  /* Header */
+  header{text-align:center;padding-top:6px}
+  .kicker{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-weight:800}
+  h1{font-family:'Anton',sans-serif;font-size:clamp(34px,11vw,52px);line-height:.92;
+     letter-spacing:.01em;margin-top:6px;text-transform:uppercase;
+     background:linear-gradient(180deg,#fff 0%,var(--gold-soft) 55%,var(--gold) 100%);
+     -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{margin-top:8px;font-size:13px;color:var(--muted);font-weight:600}
+
+  /* Clock */
+  .clock{display:flex;align-items:baseline;justify-content:center;gap:10px;margin-top:2px}
+  .clock .time{font-family:'Anton',sans-serif;font-size:clamp(40px,15vw,64px);letter-spacing:.04em;color:#fff;font-variant-numeric:tabular-nums}
+  .clock .sec{font-family:'Anton',sans-serif;font-size:clamp(20px,7vw,30px);color:var(--gold);font-variant-numeric:tabular-nums}
+
+  /* Task card */
+  .card{
+    position:relative;background:linear-gradient(180deg,var(--card),var(--bg2));
+    border:1px solid var(--line);border-radius:22px;padding:26px 22px 24px;
+    box-shadow:0 24px 60px -30px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.04);
+    flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;
+    min-height:300px;overflow:hidden;
+  }
+  .card::before{content:"";position:absolute;inset:0;border-radius:22px;
+    background:radial-gradient(80% 50% at 50% 0%, rgba(245,178,26,.10), transparent 70%);pointer-events:none}
+  .slot{display:inline-flex;align-items:center;gap:8px;align-self:center;
+    background:rgba(245,178,26,.12);border:1px solid var(--line);color:var(--gold-soft);
+    font-weight:800;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    padding:7px 14px;border-radius:999px}
+  .emoji{font-size:clamp(46px,16vw,68px);line-height:1;margin:16px 0 8px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
+  .task-title{font-family:'Anton',sans-serif;font-size:clamp(28px,9vw,42px);line-height:1.02;
+    text-transform:uppercase;letter-spacing:.01em;color:#fff;margin-bottom:12px}
+  .task-desc{font-size:clamp(15px,4.2vw,18px);line-height:1.5;color:var(--cream);opacity:.92;max-width:34ch;margin:0 auto}
+
+  .card.swap{animation:pop .45s cubic-bezier(.2,.9,.25,1)}
+  @keyframes pop{0%{opacity:0;transform:translateY(14px) scale(.97)}100%{opacity:1;transform:none}}
+
+  /* Countdown row */
+  .next{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:14px 18px}
+  .next .lbl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:800}
+  .next .val{font-family:'Anton',sans-serif;font-size:26px;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+  .progress{height:6px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:-6px}
+  .progress > i{display:block;height:100%;width:0;border-radius:999px;
+    background:linear-gradient(90deg,var(--red),var(--gold));transition:width .9s linear}
+
+  /* Penalty */
+  .penalty{display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;
+    background:linear-gradient(180deg,rgba(226,0,26,.16),rgba(226,0,26,.05));
+    border:1px solid rgba(226,0,26,.35);border-radius:16px;padding:14px 16px;
+    font-weight:800;font-size:14px;color:#ffd0d0}
+  .penalty .beer{font-size:22px;animation:tilt 2.4s ease-in-out infinite}
+  @keyframes tilt{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+
+  /* Plan toggle */
+  .planbtn{background:none;border:1px dashed rgba(245,178,26,.3);color:var(--gold-soft);
+    font-family:inherit;font-weight:700;font-size:13px;letter-spacing:.04em;padding:11px;border-radius:12px;cursor:pointer}
+  .planbtn:active{transform:scale(.98)}
+  .plan{display:none;flex-direction:column;gap:2px;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:8px;overflow:hidden}
+  .plan.open{display:flex}
+  .plan .row{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;font-size:14px}
+  .plan .row:not(:last-child){border-bottom:1px solid rgba(255,255,255,.04)}
+  .plan .row.now{background:rgba(245,178,26,.12)}
+  .plan .row.done{opacity:.4}
+  .plan .t{font-family:'Anton',sans-serif;color:var(--gold);font-size:15px;min-width:48px;font-variant-numeric:tabular-nums}
+  .plan .e{font-size:18px;width:24px;text-align:center}
+  .plan .n{font-weight:600;color:var(--cream)}
+
+  footer{text-align:center;color:var(--muted);font-size:11px;letter-spacing:.08em;padding-top:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Fabians JGA</div>
+    <h1>Stunden<br>Challenge</h1>
+    <div class="clock"><span class="time" id="clk">--:--</span><span class="sec" id="sec">00</span></div>
+    <div class="sub" id="phaseSub">Start: morgen, 9:00 Uhr</div>
+  </header>
+
+  <div class="card" id="card">
+    <span class="slot" id="slot">Aufgabe</span>
+    <div class="emoji" id="emoji">🍺</div>
+    <div class="task-title" id="title">Lädt…</div>
+    <div class="task-desc" id="desc"></div>
+  </div>
+
+  <div class="progress" id="progWrap"><i id="prog"></i></div>
+
+  <div class="next" id="nextRow">
+    <span class="lbl" id="nextLbl">Nächste Aufgabe in</span>
+    <span class="val" id="nextVal">--:--</span>
+  </div>
+
+  <div class="penalty"><span class="beer">🍺</span><span>Versagt oder Fehler gemacht? → Ein Kölsch exen!</span></div>
+
+  <button class="planbtn" id="planBtn">📋 Ganzen Spielplan zeigen</button>
+  <div class="plan" id="plan"></div>
+
+  <footer>Es zählt die Uhrzeit deines Handys · Prost 🍻</footer>
+</div>
+
+<script>
+  // ---- Konfiguration ----
+  // Start: morgen früh 9:00 Uhr (lokale Zeit). Monat ist 0-basiert -> 5 = Juni.
+  const START = new Date(2026, 5, 19, 9, 0, 0).getTime();
+  const HOUR = 60 * 60 * 1000;
+
+  // Fester, durchgemischter Stundenplan (auf allen Handys identisch)
+  const TASKS = [
+    {e:"🚫", t:"Kein „Ja“",            d:"Du darfst eine Stunde lang kein einziges Mal „Ja“ sagen."},
+    {e:"🔙", t:"Nur rückwärts",        d:"Du darfst dich nur noch rückwärts fortbewegen. Jeder Schritt nach vorne zählt."},
+    {e:"🗣️", t:"Dritte Person",                d:"Rede über dich nur in der dritten Person: „Fabian hat Durst.“"},
+    {e:"💪", t:"100 Liegestütze",          d:"100 Liegestütze, frei verteilt über die Stunde. Am Ende müssen alle stehen."},
+    {e:"🇬🇧", t:"Nur Englisch",                d:"Du sprichst nur noch Englisch. Every single word. No German."},
+    {e:"🙆", t:"Arm auf dem Kopf",             d:"Ein Arm (egal welcher) bleibt die ganze Stunde auf dem Kopf."},
+    {e:"🚫", t:"Kein „Nein“",          d:"Du darfst eine Stunde lang kein einziges Mal „Nein“ sagen."},
+    {e:"🏋️", t:"5 Min Plank",                  d:"Insgesamt 5 Minuten Plank, über die Stunde verteilt. Du teilst dir's selbst ein."},
+    {e:"🏷️", t:"Spitznamen",                   d:"Niemand wird beim echten Namen genannt – jeder kriegt von dir einen Spitznamen, der gilt."},
+    {e:"🤫", t:"Nur flüstern",             d:"Du darfst nur noch flüstern. Kein lautes Wort."},
+    {e:"📱", t:"Handy = Hampelmänner",     d:"Bei jeder hörbaren Handy-Benachrichtigung sofort 5 Hampelmänner."},
+    {e:"⛔", t:"Weder Ja noch Nein",           d:"Beide Wörter komplett verboten: kein „Ja“, kein „Nein“."},
+    {e:"🤚", t:"Hand in der Tasche",           d:"Eine Hand bleibt die ganze Stunde in der Hosentasche."},
+    {e:"🦵", t:"150 Kniebeugen",               d:"150 Kniebeugen, frei verteilt über die Stunde."},
+    {e:"❓", t:"Nur Gegenfragen",              d:"Jede Frage darfst du nur mit einer Gegenfrage beantworten."},
+    {e:"🎩", t:"„Sir“ / „Eure Hoheit“", d:"Du sprichst jeden nur noch mit „Sir“ oder „Eure Hoheit“ an."},
+    {e:"🤐", t:"Komplett stumm",               d:"Kein Wort über die Lippen – eine Stunde absolutes Schweigen."},
+    {e:"🍺", t:"Kölsch in der Hand",       d:"Dein Kölsch darf nie abgestellt werden – immer in der Hand."}
+  ];
+
+  // ---- Helfer ----
+  const pad = n => String(n).padStart(2,"0");
+  const hhmm = ms => { const d=new Date(ms); return pad(d.getHours())+":"+pad(d.getMinutes()); };
+  const cdown = ms => {
+    let s = Math.max(0, Math.floor(ms/1000));
+    const h = Math.floor(s/3600); s%=3600;
+    const m = Math.floor(s/60); s%=60;
+    return (h>0? pad(h)+":" : "") + pad(m)+":"+pad(s);
+  };
+
+  const $ = id => document.getElementById(id);
+  let curIdx = -2; // -2 vor Start, -1 = nichts, sonst Index
+  let planBuilt = false;
+
+  function buildPlan(){
+    const plan = $("plan");
+    plan.innerHTML = "";
+    TASKS.forEach((task,i)=>{
+      const row = document.createElement("div");
+      row.className = "row";
+      row.id = "planrow"+i;
+      row.innerHTML = '<span class="t">'+hhmm(START+i*HOUR)+'</span>'+
+                      '<span class="e">'+task.e+'</span>'+
+                      '<span class="n">'+task.t+'</span>';
+      plan.appendChild(row);
+    });
+    planBuilt = true;
+  }
+  function markPlan(idx){
+    if(!planBuilt) return;
+    TASKS.forEach((_,i)=>{
+      const r = $("planrow"+i);
+      if(!r) return;
+      r.classList.toggle("now", i===idx);
+      r.classList.toggle("done", idx>=0 && i<idx);
+    });
+  }
+
+  function showTask(idx){
+    const task = TASKS[idx];
+    $("slot").textContent = "Aufgabe "+(idx+1)+" von "+TASKS.length+"  ·  "+hhmm(START+idx*HOUR)+"–"+hhmm(START+(idx+1)*HOUR);
+    $("emoji").textContent = task.e;
+    $("title").textContent = task.t;
+    $("desc").textContent = task.d;
+    const card = $("card");
+    card.classList.remove("swap"); void card.offsetWidth; card.classList.add("swap");
+    markPlan(idx);
+  }
+
+  function tick(){
+    const now = Date.now();
+    const d = new Date(now);
+    $("clk").textContent = pad(d.getHours())+":"+pad(d.getMinutes());
+    $("sec").textContent = pad(d.getSeconds());
+
+    const elapsed = now - START;
+
+    // Vor dem Start
+    if(elapsed < 0){
+      if(curIdx !== -2){
+        curIdx = -2;
+        $("slot").textContent = "Gleich geht's los";
+        $("emoji").textContent = "⏳";
+        $("title").textContent = "Bald geht's los!";
+        $("desc").textContent = "Die erste Aufgabe startet morgen um 9:00 Uhr. Haltet euch bereit.";
+        $("nextLbl").textContent = "Start in";
+        $("phaseSub").textContent = "Start: "+hhmm(START)+" Uhr";
+        markPlan(-1);
+      }
+      $("nextVal").textContent = cdown(-elapsed);
+      $("prog").style.width = "0%";
+      return;
+    }
+
+    const idx = Math.floor(elapsed / HOUR);
+
+    // Nach der letzten Aufgabe
+    if(idx >= TASKS.length){
+      if(curIdx !== -1){
+        curIdx = -1;
+        $("slot").textContent = "Durchgespielt";
+        $("emoji").textContent = "🏆";
+        $("title").textContent = "Geschafft!";
+        $("desc").textContent = "Alle Stunden durch. Fabian hat überlebt (mehr oder weniger). PROST! 🍻";
+        $("nextRow").style.display = "none";
+        $("progWrap").style.display = "none";
+        $("phaseSub").textContent = "Alle "+TASKS.length+" Aufgaben erledigt";
+        markPlan(-1);
+      }
+      return;
+    }
+
+    // Laufende Aufgabe
+    if(idx !== curIdx){
+      curIdx = idx;
+      showTask(idx);
+      $("nextLbl").textContent = (idx+1 < TASKS.length) ? "Nächste Aufgabe in" : "Letzte Aufgabe – Ende in";
+      $("phaseSub").textContent = "Aufgabe "+(idx+1)+" von "+TASKS.length+" läuft";
+    }
+    const intoHour = elapsed % HOUR;
+    $("nextVal").textContent = cdown(HOUR - intoHour);
+    $("prog").style.width = (intoHour/HOUR*100).toFixed(1)+"%";
+  }
+
+  $("planBtn").addEventListener("click", ()=>{
+    if(!planBuilt) buildPlan();
+    const open = $("plan").classList.toggle("open");
+    markPlan(curIdx>=0?curIdx:-1);
+    $("planBtn").textContent = open ? "📋 Spielplan ausblenden" : "📋 Ganzen Spielplan zeigen";
+  });
+
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>
