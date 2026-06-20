@@ -99,7 +99,7 @@
     <div class="kicker">Junggesellenabschied</div>
     <h1>Fabys JGA<br>Challenge</h1>
     <div class="clock"><span class="time" id="clk">--:--</span><span class="sec" id="sec">00</span></div>
-    <div class="sub" id="phaseSub">Start: morgen, 9:00 Uhr</div>
+    <div class="sub" id="phaseSub">Start: 11:00 Uhr</div>
   </header>
 
   <div class="card" id="card">
@@ -125,27 +125,27 @@
 
 <script>
   const HOUR = 60 * 60 * 1000;
-  // Monat ist 0-basiert -> 5 = Juni. Alles am Freitag 19.06. (00:00 = Nacht auf Sa, durchgehend).
+  // Monat ist 0-basiert -> 5 = Juni. Start Sa 20.06. 11:00, durchgehend bis So 21.06. 03:00.
   const mk = (y,mo,d,h,e,t,desc) => ({start:new Date(y,mo,d,h,0,0).getTime(), e, t, d:desc});
 
   // Fester, geheimer Stundenplan (auf allen Handys identisch). Reihenfolge = Überraschung.
   const SLOTS = [
-    mk(2026,5,19, 9,"🙆","Arm auf dem Kopf",      "Ein Arm (egal welcher) bleibt die ganze Stunde auf dem Kopf."),
-    mk(2026,5,19,10,"🗣️","Dritte Person",          "Rede über dich nur in der dritten Person: „Fabian hat Durst.“"),
-    mk(2026,5,19,11,"🍺","Kölsch in der Hand",     "Dein Kölsch darf nie abgestellt werden – immer in der Hand."),
-    mk(2026,5,19,12,"🔙","Nur rückwärts",          "Du darfst dich nur noch rückwärts fortbewegen. Jeder Schritt nach vorne zählt."),
-    mk(2026,5,19,13,"🚫","Kein „Ja“",              "Du darfst eine Stunde lang kein einziges Mal „Ja“ sagen."),
-    mk(2026,5,19,14,"💪","100 Liegestütze",        "100 Liegestütze, frei verteilt über die Stunde. Am Ende müssen alle stehen."),
-    mk(2026,5,19,15,"🇬🇧","Nur Englisch",           "Du sprichst nur noch Englisch. Every single word. No German."),
-    mk(2026,5,19,16,"📱","Handy = Hampelmänner",   "Bei jeder hörbaren Handy-Benachrichtigung sofort 5 Hampelmänner."),
-    mk(2026,5,19,17,"🏋️","5× 1 Min Plank",         "Fünfmal eine Minute Plank, über die Stunde verteilt. Du teilst dir's selbst ein."),
-    mk(2026,5,19,18,"🤫","Nur flüstern",           "Du darfst nur noch flüstern. Kein lautes Wort."),
-    mk(2026,5,19,19,"🦵","100 Kniebeugen",         "100 Kniebeugen, frei verteilt über die Stunde."),
-    mk(2026,5,19,20,"🚫","Kein „Nein“",            "Du darfst eine Stunde lang kein einziges Mal „Nein“ sagen."),
-    mk(2026,5,19,21,"🤐","Komplett stumm",         "Kein Wort über die Lippen – eine Stunde absolutes Schweigen."),
-    mk(2026,5,19,22,"🙉","Keine Fragen beantworten","Du darfst keine einzige Frage beantworten – egal, was man dich fragt."),
-    mk(2026,5,19,23,"⛔","Weder Ja noch Nein",     "Beide Wörter komplett verboten: kein „Ja“, kein „Nein“."),
-    mk(2026,5,20, 0,"🎩","„Sir“ / „Eure Hoheit“",  "Du sprichst jeden nur noch mit „Sir“ oder „Eure Hoheit“ an.")
+    mk(2026,5,20,11,"🚫","Kein „Ja“",              "Du darfst eine Stunde lang kein einziges Mal „Ja“ sagen."),
+    mk(2026,5,20,12,"💪","100 Liegestütze",        "100 Liegestütze, frei verteilt über die Stunde. Am Ende müssen alle stehen."),
+    mk(2026,5,20,13,"🗣️","Dritte Person",          "Rede über dich nur in der dritten Person: „Fabian hat Durst.“"),
+    mk(2026,5,20,14,"🔙","Nur rückwärts",          "Du darfst dich nur noch rückwärts fortbewegen. Jeder Schritt nach vorne zählt."),
+    mk(2026,5,20,15,"🇬🇧","Nur Englisch",           "Du sprichst nur noch Englisch. Every single word. No German."),
+    mk(2026,5,20,16,"🏋️","5× 1 Min Plank",         "Fünfmal eine Minute Plank, über die Stunde verteilt. Du teilst dir's selbst ein."),
+    mk(2026,5,20,17,"🙆","Arm auf dem Kopf",      "Ein Arm (egal welcher) bleibt die ganze Stunde auf dem Kopf."),
+    mk(2026,5,20,18,"📱","Handy = Hampelmänner",   "Bei jeder hörbaren Handy-Benachrichtigung sofort 5 Hampelmänner."),
+    mk(2026,5,20,19,"🚫","Kein „Nein“",            "Du darfst eine Stunde lang kein einziges Mal „Nein“ sagen."),
+    mk(2026,5,20,20,"🦵","100 Kniebeugen",         "100 Kniebeugen, frei verteilt über die Stunde."),
+    mk(2026,5,20,21,"🤫","Nur flüstern",           "Du darfst nur noch flüstern. Kein lautes Wort."),
+    mk(2026,5,20,22,"🍺","Kölsch in der Hand",     "Dein Kölsch darf nie abgestellt werden – immer in der Hand."),
+    mk(2026,5,20,23,"🙉","Keine Fragen beantworten","Du darfst keine einzige Frage beantworten – egal, was man dich fragt."),
+    mk(2026,5,21, 0,"🤐","Komplett stumm",         "Kein Wort über die Lippen – eine Stunde absolutes Schweigen."),
+    mk(2026,5,21, 1,"⛔","Weder Ja noch Nein",     "Beide Wörter komplett verboten: kein „Ja“, kein „Nein“."),
+    mk(2026,5,21, 2,"🎩","„Sir“ / „Eure Hoheit“",  "Du sprichst jeden nur noch mit „Sir“ oder „Eure Hoheit“ an.")
   ];
 
   const pad = n => String(n).padStart(2,"0");
@@ -248,8 +248,8 @@
         $("slot").textContent = "Gleich geht's los";
         $("emoji").textContent = "⏳";
         $("title").textContent = "Bald geht's los!";
-        $("desc").textContent  = "Die erste Aufgabe startet morgen um 9:00 Uhr. Haltet euch bereit.";
-        $("phaseSub").textContent = "Start: morgen, 9:00 Uhr";
+        $("desc").textContent  = "Die erste Aufgabe startet um 11:00 Uhr. Haltet euch bereit.";
+        $("phaseSub").textContent = "Start: 11:00 Uhr";
         $("nextLbl").textContent  = "Start in";
         $("nextRow").style.display = "flex";
         $("progWrap").style.display = "none";
